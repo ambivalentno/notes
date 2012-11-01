@@ -20,7 +20,6 @@ class MyTests(WebTest):
         assert note.title in index_page
         assert note.text in index_page
 
-    
     def test_that_admin_works(self):
         login_page = self.app.get('/admin').follow()
         form = login_page.form
@@ -30,7 +29,7 @@ class MyTests(WebTest):
         res = res.follow()
         assert u'/note/add/' in res.body
         #I'm not really sure what particular link should I press
-        #UPD: got it from 'print res.body' 
+        #UPD: got it from 'print res.body'
         add_note = res.click(href='/admin/notes/note/add/')
         #I've had form field list with this:
         #print add_note.form.fields
@@ -41,7 +40,3 @@ class MyTests(WebTest):
         index_page = self.app.get('/')
         assert 'new_test_title' in index_page
         assert 'new_test_text' in index_page
-
-
-
-        
