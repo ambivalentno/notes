@@ -22,7 +22,7 @@ class MyTests(WebTest):
 
     
     def test_that_admin_works(self):
-        login_page = self.app.get('/admin')
+        login_page = self.app.get('/admin').follow()
         form = login_page.form
         form[u'username'] = 'nikita'
         form[u'password'] = 'n1k1ta'
@@ -30,5 +30,18 @@ class MyTests(WebTest):
         res = res.follow()
         assert u'/note/add/' in res.body
         #I'm not really sure what particular link should I press
-        res = res.click(href='note/add/')
-        #and what will happen next.
+        #UPD: got it from 'print res.body' 
+        add_note = res.click(href='/admin/notes/note/add/')
+        #I've had form field list with this:
+        #print add_note.form.fields
+        form = add_note.form
+        form[u'title'] = u'new_test_title'
+        form[u'text'] = u'new_test_text'
+        res = form.submit(u'_save')
+        index_page = self.app.get('/')
+        assert 'new_test_title' in index_page
+        assert 'new_test_text' in index_page
+
+
+
+        
