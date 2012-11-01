@@ -17,7 +17,6 @@ class MyTests(WebTest):
         note.save()
         index_page = self.app.get('/')
         self.assertTemplateUsed(index_page, template_name='index.html')
-        index_page.showbrowser()
         assert note.title in index_page
         assert note.text in index_page
 
