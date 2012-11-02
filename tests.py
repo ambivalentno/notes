@@ -40,3 +40,16 @@ class MyTests(WebTest):
         index_page = self.app.get('/')
         assert 'new_test_title' in index_page
         assert 'new_test_text' in index_page
+
+    def test_adding_new_note(self):
+        add_page = self.app.get('/add_note')
+        form = form_page.form
+        form[u'title'] = 'test'
+        form[u'text'] = 'test'
+        response = form.submit()
+        assert u'Please, insert longer text' in response
+        form = response.form
+        form[u'title'] = 'test'
+        form[u'text'] = 'test_test_test'
+        form.submit()
+        assert u'test_test_test' in self.app.get('/')
