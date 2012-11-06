@@ -1,11 +1,9 @@
-from django import forms
+from forms import NewNoteForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from notes.models import Note
 
-class NewNoteForm(forms.Form):
-	title = forms.CharField(max_length=50)
-	text = forms.CharField(min_length=10)
+
 
 def index(request):
     context = {'notes': Note.objects.all()}
@@ -13,11 +11,21 @@ def index(request):
 
 def add_note(request):
 	if request.method == 'POST':
-		form = NewNoteForm(request.POST)
+		inpname = request.POST[u'form_name']
+		form = NewNoteForm(request.POST, name=inpname)
 		if form.is_valid():
-			note = Note(title=form.cleaned_data['title'], text=form.cleaned_data['text'])
+			shared_name = form.cleaned_data['form_name']
+			text_name = 'text'+shared_name+'_0' #created new name, as it changed after new widget creation
+			note = Note(title=form.cleaned_data['title'], text=form.cleaned_data[text_name])
 			note.save()
 			return HttpResponseRedirect('/')
+		else:
+			print form.cleaned_data
 	else:
-		form = NewNoteForm()
+		form = NewNoteForm(name='add_note')
 	return render(request, 'add_note.html', {'form' : form})
+
+def count(request):
+	form1 = NewNoteForm(name='test')
+	form2 = NewNoteForm(name='test2')
+	return render(request, 'count.html', {'forms' : [form1,form2]})
