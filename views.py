@@ -11,21 +11,19 @@ def index(request):
 
 def add_note(request):
 	if request.method == 'POST':
-		inpname = request.POST[u'form_name']
-		form = NewNoteForm(request.POST, name=inpname)
+		form = NewNoteForm(data=request.POST)
 		if form.is_valid():
-			shared_name = form.cleaned_data['form_name']
-			text_name = 'text'+shared_name+'_0' #created new name, as it changed after new widget creation
-			note = Note(title=form.cleaned_data['title'], text=form.cleaned_data[text_name])
-			note.save()
-			return HttpResponseRedirect('/')
-		else:
 			print form.cleaned_data
+			shared_name = form.cleaned_data['form_name']
+			text_name = 'text'+shared_name #created new name, as it changed after new widget creation
+			note = Note(title=form.cleaned_data['title'], text=form.cleaned_data[text_name][0])
+			#note.save()
+			return HttpResponseRedirect('/')
 	else:
-		form = NewNoteForm(name='add_note')
+		form = NewNoteForm(data={'form_name':'add_note'})
 	return render(request, 'add_note.html', {'form' : form})
 
 def count(request):
-	form1 = NewNoteForm(name='test')
-	form2 = NewNoteForm(name='test2')
+	form1 = NewNoteForm(attrs={'form_name':'test'})
+	form2 = NewNoteForm(attrs={'form_name':'test2'})
 	return render(request, 'count.html', {'forms' : [form1,form2]})
