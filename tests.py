@@ -48,20 +48,20 @@ class MyTests(WebTest):
         add_page = self.app.get('/add_note').follow()
         form = add_page.form
         form[u'title'] = 'test'
-        form[u'textadd_note_0'] = 'test'
+        form[u'text_0'] = 'test'
         response = form.submit(u'Submit')
-        assert u'Ensure this value has at least 10 characters' in response
+        assert u'You need to post smth longer than 10 symbols.' in response
         form = response.form
         form[u'title'] = 'test'
-        form[u'textadd_note_0'] = 'test_test_test'
+        form[u'text_0'] = 'test_test_test'
         form.submit()
         #self.app.get('/').showbrowser()
         assert u'test_test_test' in self.app.get('/')
 
     def test_custom_widget(self):
         page = self.app.get('/count/')
-        assert 'name="texttest_0"' in page
-        assert 'name="texttest2_0"' in page
+        assert 'id="id_texttest_0"' in page
+        assert 'id="id_texttest2_0"' in page
 
 
 
