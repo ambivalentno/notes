@@ -6,6 +6,7 @@ from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+
 class MyTests(WebTest):
     fixtures = ['starting.json']
 
@@ -48,46 +49,45 @@ class MyTests(WebTest):
         add_page = self.app.get('/add_note').follow()
         form = add_page.form
         form[u'title'] = 'test'
-        form[u'text_0'] = 'test'
+        form[u'text'] = 'test'
         response = form.submit(u'Submit')
-        assert u'You need to post smth longer than 10 symbols.' in response
+        assert u'Ensure this value has at least 10 characters' in response
         form = response.form
         form[u'title'] = 'test'
-        form[u'text_0'] = 'test_test_test'
+        form[u'text'] = 'test_test_test'
         form.submit()
-        #self.app.get('/').showbrowser()
+        # self.app.get('/').showbrowser()
         assert u'test_test_test' in self.app.get('/')
 
     def test_custom_widget(self):
         page = self.app.get('/count/')
-        assert 'id="id_texttest_0"' in page
-        assert 'id="id_texttest2_0"' in page
+        assert 'id="test"' in page
+        assert 'id="test2"' in page
 
 
+class SeleniumTests(LiveServerTestCase):
+    #I wasn't able to find solid and simple solution to test javascript
+    #with webtest. so I'm using selenium for this
+    #UPD: actually, this stuff don't also :(
 
-# class SeleniumTests(LiveServerTestCase):
-#     #I wasn't able to find solid and simple solution to test javascript
-#     #with webtest. so I'm using selenium for this
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(3)
 
-#     def setUp(self):
-#         self.browser = webdriver.Firefox()
-#         self.browser.implicitly_wait(3)
+    def tearDown(self):
+        self.browser.quit()
 
-#     def tearDown(self):
-#         pass
-#         # self.browser.quit()
-
-#     def test_can_count_symbols(self):
-#         self.browser.get(self.live_server_url + '/count/')
-#         body = self.browser.find_element_by_tag_name('body')
-#         #first input
-#         textinput = self.browser.find_element_by_name('texttest_0')
-#         textinput.send_keys('admin111')
-#         #second input on the same page
-#         textinput2 = self.browser.find_element_by_name('texttest2_0')
-#         textinput2.send_keys('admin1111')
-#         #sequentual assert for two inputs
-#         self.assertIn('8', body.text)
-#         self.assertIn('9', body.text)
-#         #simmultaneous assert
-#         assert '8' in body.text and '9' in body.text
+    def test_can_count_symbols(self):
+        self.browser.get(self.live_server_url + '/count/')
+        body = self.browser.find_element_by_tag_name('body')
+        #first input
+        textinput = self.browser.find_element_by_id('test')
+        textinput.send_keys('admin111', Keys.RETURN)
+        #second input on the same page
+        textinput2 = self.browser.find_element_by_id('test2')
+        textinput2.send_keys('admin1111', Keys.ARROW_DOWN)
+        #sequentual assert for two inputs
+        self.assertIn('8', body.text)
+        self.assertIn('9', body.text)
+        #simmultaneous assert
+        assert '8' in body.text and '9' in body.text
