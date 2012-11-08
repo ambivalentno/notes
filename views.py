@@ -10,15 +10,12 @@ def index(request):
 
 
 def add_note(request):
-    if request.method == 'POST':
-        form = NewNoteForm(attrs=request.POST)
-        if form.is_valid():
+    form = NewNoteForm(attrs=request.POST or attrs={'form_name': 'add_note'})
+    if form.is_valid():
             note = Note(title=form.cleaned_data['title'],
              text=form.cleaned_data['text'])
             note.save()
             return HttpResponseRedirect('/')
-    else:
-        form = NewNoteForm(attrs={'form_name': 'add_note'})
     return render(request, 'add_note.html', {'form': form})
 
 
