@@ -2,6 +2,10 @@
 from django_webtest import WebTest
 from notes.models import Note
 
+from django.test import LiveServerTestCase
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 
 class MyTests(WebTest):
     fixtures = ['starting.json']
@@ -52,5 +56,52 @@ class MyTests(WebTest):
         form[u'title'] = 'test'
         form[u'text'] = 'test_test_test'
         form.submit()
-        #self.app.get('/').showbrowser()
+        # self.app.get('/').showbrowser()
         assert u'test_test_test' in self.app.get('/')
+
+    def test_custom_widget(self):
+        page = self.app.get('/count/')
+        assert 'id="test"' in page
+        assert 'id="test2"' in page
+
+    def test_custom_widget_in_admin(self):
+        testing_note = Note(title='sometitle', text='sometext1111')
+        testing_note.save()
+        login_page = self.app.get('/admin').follow()
+        form = login_page.form
+        form[u'username'] = 'nikita'
+        form[u'password'] = 'n1k1ta'
+        res = form.submit()
+        res = res.follow()
+        notes = res.click('Notes', href='/admin/notes/note/')
+        edit_note = notes.click('sometitle')
+        #test if onclick with default values exist here
+        assert "somef(&#39;default_id&#39;,&#39;output_default_id&#39;)" in edit_note
+
+
+# class SeleniumTests(LiveServerTestCase):
+#     #I wasn't able to find solid and simple solution to test javascript
+#     #with webtest. so I'm using selenium for this
+#     #UPD: actually, this stuff don't also :(
+
+#     def setUp(self):
+#         self.browser = webdriver.Firefox()
+#         self.browser.implicitly_wait(3)
+
+#     def tearDown(self):
+#         self.browser.quit()
+
+#     def test_can_count_symbols(self):
+#         self.browser.get(self.live_server_url + '/count/')
+#         body = self.browser.find_element_by_tag_name('body')
+#         #first input
+#         textinput = self.browser.find_element_by_id('test')
+#         textinput.send_keys('admin111', Keys.RETURN)
+#         #second input on the same page
+#         textinput2 = self.browser.find_element_by_id('test2')
+#         textinput2.send_keys('admin1111', Keys.ARROW_DOWN)
+#         #sequentual assert for two inputs
+#         self.assertIn('8', body.text)
+#         self.assertIn('9', body.text)
+#         #simmultaneous assert
+#         assert '8' in body.text and '9' in body.text
