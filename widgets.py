@@ -5,15 +5,15 @@ from django.forms.util import flatatt
 
 class NewTextarea(Textarea):
     class Media:
-        js = ('test.js',)
+        js = ('test.js','jquery.js',)
 
     def __init__(self, attrs=None):
-        default_attrs = {'name': 'default_name'}
+        default_attrs = {'name': 'default_name', 'id': 'default_id'}
         if attrs:
             default_attrs.update(attrs)
 
-        default_attrs['onclick'] = "somef('" + attrs['id'] + "','output_" + \
-            attrs['id'] + "')"
+        default_attrs['onclick'] = "somef('" + default_attrs['id'] + \
+            "','output_" + default_attrs['id'] + "')"
         super(NewTextarea, self).__init__(attrs=default_attrs)
 
     def render(self, name, value, attrs=None):

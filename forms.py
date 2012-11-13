@@ -1,6 +1,7 @@
 from django import forms
 from django.forms.widgets import HiddenInput
 from widgets import NewTextarea
+from models import Note
 
 
 class NewNoteForm(forms.Form):
@@ -15,3 +16,10 @@ class NewNoteForm(forms.Form):
         self.fields['text'] = forms.CharField(widget=NewTextarea(
             attrs=newtextarea_attrs),
             min_length=10)
+
+
+class NoteAdminForm(forms.ModelForm):
+    text = forms.CharField(widget=NewTextarea())
+
+    class Meta:
+        model = Note
