@@ -10,7 +10,7 @@ def index(request):
 
 
 def add_note(request):
-    form = NewNoteForm(attrs=request.POST or attrs={'form_name': 'add_note'})
+    form = NewNoteForm(attrs=request.POST or None)
     if form.is_valid():
             note = Note(title=form.cleaned_data['title'],
              text=form.cleaned_data['text'])
@@ -20,6 +20,6 @@ def add_note(request):
 
 
 def count(request):
-    form1 = NewNoteForm(attrs={'form_name': 'test'})
-    form2 = NewNoteForm(attrs={'form_name': 'test2'})
+    form1 = NewNoteForm(formname='test')
+    form2 = NewNoteForm(formname='test2')
     return render(request, 'count.html', {'forms': [form1, form2]})
