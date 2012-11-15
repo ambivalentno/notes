@@ -15,7 +15,11 @@ def add_note(request):
             note = Note(title=form.cleaned_data['title'],
              text=form.cleaned_data['text'])
             note.save()
+            if request.is_ajax():
+                return render(request, 'ajax_success')
             return HttpResponseRedirect('/')
+    if request.is_ajax():
+                return render(request, 'ajax_fail')
     return render(request, 'add_note.html', {'form': form})
 
 

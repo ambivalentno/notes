@@ -88,6 +88,20 @@ class MyTests(WebTest):
         page = self.app.get('/add_note/')
         assert 'notes number=2' in page
 
+    def test_ajax(self):
+        add_page = self.app.get('/add_note').follow()
+        form = add_page.form
+        form[u'title'] = 'test'
+        form[u'text'] = 'test'
+        form.submit(u'Submit')
+        assert u'Ensure this value has at least 10 characters' in add_page
+        form = response.form
+        form[u'title'] = 'test'
+        form[u'text'] = 'test_test_test'
+        form.submit()
+        assert u'Form submitted' in add_page
+        assert u'test_test_test' in self.app.get('/')
+
 
 # class SeleniumTests(LiveServerTestCase):
 #     #I wasn't able to find solid and simple solution to test javascript
