@@ -1,16 +1,15 @@
-{% load show_note %}
-<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
-<div class="span8 offset2">
-    
-    <div id="content">
-        {% for note in notes %}
-			<div name="note_{{note.id}}" class="page-header">
-				{% show_note note %}
-			</div>
-		{% endfor %}
+{% extends "base.html" %}
+
+{% block content%}
+    {% load show_note %}
+    <div class="span8 offset2">
+        
+        <div id="content">
+            {% for note in notes %}
+    			<div name="note_{{note.id}}" class="page-header">
+    				{% show_note note %}
+    			</div>
+    		{% endfor %}
+        </div>
     </div>
-    
-
-</div>
-
+{% endblock %}

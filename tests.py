@@ -78,6 +78,16 @@ class MyTests(WebTest):
         #test if onclick with default values exist here
         assert "somef(&#39;default_id&#39;,&#39;output_default_id&#39;)" in edit_note
 
+    def test_notes_nmbr_in_context(self):
+        testing_note = Note(title='sometitle1', text='sometext1111')
+        testing_note.save()
+        testing_note = Note(title='sometitle2', text='sometext1111')
+        testing_note.save()
+        page = self.app.get('/')
+        assert 'notes number=2' in page
+        page = self.app.get('/add_note/')
+        assert 'notes number=2' in page
+
 
 # class SeleniumTests(LiveServerTestCase):
 #     #I wasn't able to find solid and simple solution to test javascript
