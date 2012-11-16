@@ -1,9 +1,39 @@
 {% extends "base.html" %}
 
 {% block content%}
-    <form action="/add_note/" method="post">{% csrf_token %}
-        {{form.media}}
-    	{{ form.as_ul }}
-    	<input type="submit" value="Submit" name="Submit" />
+
+<script type="text/javascript">
+  
+    $(function() {
+        $("#contactform").bind("submit", function(e) {
+            var form = jQuery("#contactform");
+            e.preventDefault(); 
+            $("#sendbutton").attr('disabled', true)
+            $("#sending").toggle()
+            $("#ajaxwrapper").load(
+                form.attr('action'),
+                form.serializeArray(),
+                function(responseText, responseStatus) {
+                    $("#sendbutton").attr('disabled', false)
+                    $("#sending").toggle()
+                });
+        });
+    });
+</script>
+
+    <form action="/add_note/" method="post" id="contactform">
+        <div id="ajaxwrapper">
+            {% csrf_token %}
+            {{form.media}}
+            {{ form.as_p }}
+            
+        </div>
+        <div id="sending" style="display: none;">
+            Sending message, please wait...
+        </div>
+        <p id="sendwrapper">
+            <input type="submit" value="Submit" name="Submit" id="sendbutton" />
+        </p>
     </form>
+    
 {% endblock %}
