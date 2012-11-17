@@ -12,14 +12,14 @@ def index(request):
 def add_note(request):
     form = NewNoteForm(attrs=request.POST or None)
     if form.is_valid():
-            note = Note(title=form.cleaned_data['title'],
-             text=form.cleaned_data['text'])
-            note.save()
-            if request.is_ajax():
-                return render(request, 'ajax_success')
-            return HttpResponseRedirect('/')
+        note = Note(title=form.cleaned_data['title'],
+         text=form.cleaned_data['text'])
+        note.save()
+        if request.is_ajax():
+            return render(request, 'ajax_success.html', {'form': NewNoteForm()})
+        return HttpResponseRedirect('/')
     if request.is_ajax():
-                return render(request, 'ajax_fail')
+        return render(request, 'ajax_fail.html', {'form': form}) 
     return render(request, 'add_note.html', {'form': form})
 
 

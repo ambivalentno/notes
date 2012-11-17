@@ -1,11 +1,18 @@
 {% block header %}
+    <script src="{{STATIC_URL}}jquery.js"></script>
     <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
     <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap.js"></script>
 {% endblock %}
+
+<body>
 
 {% block content %}
 {% endblock %}
 
 {% block footer %}
-    notes number={{NOTES_NUMBER}}
+    <div>
+        notes number={{NOTES_NUMBER}}
+    </div>
 {% endblock %}
+
+</body>

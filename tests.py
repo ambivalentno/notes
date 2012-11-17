@@ -9,6 +9,7 @@ from selenium.webdriver.common.keys import Keys
 
 class MyTests(WebTest):
     fixtures = ['starting.json']
+    csrf_checks = False
 
     def test_of_model(self):
         note = Note(title='sometitle', text='sometext')
@@ -89,32 +90,57 @@ class MyTests(WebTest):
         assert 'notes number=2' in page
 
     def test_ajax(self):
-        add_page = self.app.get('/add_note').follow()
-        form = add_page.form
-        form[u'title'] = 'test'
-        form[u'text'] = 'test'
-        form.submit(u'Submit')
-        assert u'Ensure this value has at least 10 characters' in add_page
-        form = response.form
-        form[u'title'] = 'test'
-        form[u'text'] = 'test_test_test'
-        form.submit()
-        assert u'Form submitted' in add_page
+        #'csrf_checks = False ' in the beginning was included because 
+        #I don't feel like manually providing csrf here is a right way to go.
+        title = ['test']
+        text = ['test']
+        post_args = {'title': title, 'text': text}
+        ajax_resp = self.app.post('/add_note/', post_args, 
+            {'X_REQUESTED_WITH': 'XMLHttpRequest'})
+        assert u'Ensure this value has at least 10 characters' in ajax_resp
+        title = ['test']
+        text = ['test_test_test']
+        post_args = {'title': title, 'text': text, 'form_name': ['add_note']}
+        ajax_resp = self.app.post('/add_note/', post_args, 
+            {'X_REQUESTED_WITH': 'XMLHttpRequest'})
+        assert u'Your message was sent. You can add a new one now.' in ajax_resp
         assert u'test_test_test' in self.app.get('/')
 
 
-# class SeleniumTests(LiveServerTestCase):
-#     #I wasn't able to find solid and simple solution to test javascript
-#     #with webtest. so I'm using selenium for this
-#     #UPD: actually, this stuff don't also :(
+class SeleniumTests(LiveServerTestCase):
 
-#     def setUp(self):
-#         self.browser = webdriver.Firefox()
-#         self.browser.implicitly_wait(3)
+    def setUp(self):
+        self.browser = webdriver.Firefox()
+        self.browser.implicitly_wait(3)
 
-#     def tearDown(self):
-#         self.browser.quit()
+    def tearDown(self):
+        # pass
+        self.browser.quit()
 
+    def test_ajax(self):
+        add_page = self.browser.get(self.live_server_url + '/add_note')
+        #input of not valid data
+        title_field = self.browser.find_element_by_name('title')
+        title_field.send_keys('title')
+        text_field = self.browser.find_element_by_name('text')
+        text_field.send_keys('text')
+        submit_button = self.browser.find_element_by_name('Submit')
+        submit_button.click()        
+        body = self.browser.find_element_by_tag_name('body')
+        assert 'Ensure this value has at least' in body.text
+        #input of valid data
+        title_field = self.browser.find_element_by_name('title')
+        text_field = self.browser.find_element_by_name('text')
+        title_field.send_keys('title')
+        text_field.send_keys('text_text_text')
+        #we don't need to renew submit_button (it didn't change after ajax call)
+        submit_button.click()
+        body = self.browser.find_element_by_tag_name('body')
+        assert 'Your message was sent. You can add a new one now.' in body.text
+
+#     I wasn't able to find solid and simple solution to test javascript
+#     with webtest. so I'm using selenium for this
+#     UPD: actually, this stuff don't also :(
 #     def test_can_count_symbols(self):
 #         self.browser.get(self.live_server_url + '/count/')
 #         body = self.browser.find_element_by_tag_name('body')

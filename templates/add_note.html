@@ -1,9 +1,22 @@
 {% extends "base.html" %}
 
 {% block content%}
-    <form action="/add_note/" method="post">{% csrf_token %}
-        {{form.media}}
-    	{{ form.as_ul }}
-    	<input type="submit" value="Submit" name="Submit" />
+<script src="{{STATIC_URL}}adding.js"></script>
+
+
+    <form action="/add_note/" method="post" id="contactform">
+        <div id="ajaxwrapper">
+            {% csrf_token %}
+            {{form.media}}
+            {{ form.as_p }}
+            
+        </div>
+        <div id="sending" style="display: none;">
+            Sending message, please wait...
+        </div>
+        <p id="sendwrapper">
+            <input type="submit" value="Submit" name="Submit" id="sendbutton" />
+        </p>
     </form>
+    
 {% endblock %}
