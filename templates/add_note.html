@@ -1,25 +1,8 @@
 {% extends "base.html" %}
 
 {% block content%}
+<script src="{{STATIC_URL}}adding.js"></script>
 
-<script type="text/javascript">
-  
-    $(function() {
-        $("#contactform").bind("submit", function(e) {
-            var form = jQuery("#contactform");
-            e.preventDefault(); 
-            $("#sendbutton").attr('disabled', true)
-            $("#sending").toggle()
-            $("#ajaxwrapper").load(
-                form.attr('action'),
-                form.serializeArray(),
-                function(responseText, responseStatus) {
-                    $("#sendbutton").attr('disabled', false)
-                    $("#sending").toggle()
-                });
-        });
-    });
-</script>
 
     <form action="/add_note/" method="post" id="contactform">
         <div id="ajaxwrapper">
