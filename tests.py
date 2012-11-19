@@ -1,10 +1,11 @@
 
 from django_webtest import WebTest
-from notes.models import Note
-
 from django.test import LiveServerTestCase
+from notes.models import Note
+from os import remove
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import Image
 
 
 class MyTests(WebTest):
@@ -57,7 +58,6 @@ class MyTests(WebTest):
         form[u'title'] = 'test'
         form[u'text'] = 'test_test_test'
         form.submit()
-        # self.app.get('/').showbrowser()
         assert u'test_test_test' in self.app.get('/')
 
     def test_custom_widget(self):
@@ -106,6 +106,35 @@ class MyTests(WebTest):
         assert u'Your message was sent. You can add a new one now.' in ajax_resp
         assert u'test_test_test' in self.app.get('/')
 
+    def test_image_upload(self):
+        add_page = self.app.get('/add_note').follow()
+        form = add_page.form
+        form[u'title'] = 'test'
+        form[u'text'] = 'test_test_test'
+        upload = form.upload_fields()[0]
+        #create a non-image file and add it to upload field
+        f = open('file.txt', 'w')
+        f.write('bubububu\n')
+        f.close()
+        upload['file'] = 'file.txt'
+        response = form.submit(u'Submit')
+        ##got to fail
+        assert u'Ensure uploaded file is an image' in response
+        remove('file.txt')
+        #create an image file and add it to upload field
+        form = response.form
+        ##title and text fields got to be same as submitted
+        assert form[u'title'] == 'test'
+        assert form[u'text'] == 'test_test_test'
+        upload['file'] = form.upload_fields()[0]
+        im =Image.new('RGB',(100,50))
+        im.save('someimage.png', format='PNG')
+        upload = 'someimage.png'
+        form.submit(u'Submit')
+        #got to overcome
+        remove('someimage.png')
+        assert u'Your message was sent. You can add a new one now.' in response
+
 
 class SeleniumTests(LiveServerTestCase):
 
@@ -117,7 +146,10 @@ class SeleniumTests(LiveServerTestCase):
         # pass
         self.browser.quit()
 
-    def test_ajax(self):
+#disabled as I don't have internet acccess, and I don't want neither 
+#download twitter over edge, nor edit templates to make them even uglier
+#than tey are now
+    def not_test_ajax(self):
         add_page = self.browser.get(self.live_server_url + '/add_note')
         #input of not valid data
         title_field = self.browser.find_element_by_name('title')
