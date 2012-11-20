@@ -111,6 +111,8 @@ class MyTests(WebTest):
         form = add_page.form
         form[u'title'] = 'test'
         form[u'text'] = 'test_test_test'
+        #print form.upload_fields()
+        #print type(form.fields['image'][0])
         upload = form.upload_fields()[0]
         #create a non-image file and add it to upload field
         f = open('file.txt', 'w')

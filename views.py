@@ -12,8 +12,11 @@ def index(request):
 def add_note(request):
     form = NewNoteForm(attrs=request.POST or None)
     if form.is_valid():
+        image_place = request.FILES or None
+        if image_place:
+            image_place = image_place['image']
         note = Note(title=form.cleaned_data['title'],
-         text=form.cleaned_data['text'])
+         text=form.cleaned_data['text'], image=image_place)
         note.save()
         if request.is_ajax():
             return render(request, 'ajax_success.html', {'form': NewNoteForm()})

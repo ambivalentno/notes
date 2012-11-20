@@ -16,6 +16,7 @@ class NewNoteForm(forms.Form):
         self.fields['text'] = forms.CharField(widget=NewTextarea(
             attrs=newtextarea_attrs),
             min_length=10)
+        self.fields['image'] = forms.ImageField(required=False)
 
 
 class NoteAdminForm(forms.ModelForm):
