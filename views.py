@@ -1,7 +1,8 @@
-from forms import NewNoteForm
+from forms import NoteForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from notes.models import Note
+from django.conf import settings
 
 
 def index(request):
@@ -10,23 +11,20 @@ def index(request):
 
 
 def add_note(request):
-    form = NewNoteForm(attrs=request.POST or None)
-    if form.is_valid():
-        image_place = request.FILES or None
-        if image_place:
-            image_place = image_place['image']
-        note = Note(title=form.cleaned_data['title'],
-         text=form.cleaned_data['text'], image=image_place)
-        note.save()
+    if request.method == 'POST':
+        form = NoteForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            if request.is_ajax():
+                return render(request, 'ajax_success.html', {'form': NoteForm()})
+            return HttpResponseRedirect('/')
         if request.is_ajax():
-            return render(request, 'ajax_success.html', {'form': NewNoteForm()})
-        return HttpResponseRedirect('/')
-    if request.is_ajax():
-        return render(request, 'ajax_fail.html', {'form': form}) 
+            return render(request, 'ajax_fail.html', {'form': form}) 
+        return render(request, 'add_note.html', {'form': form})
+    form = NoteForm()
     return render(request, 'add_note.html', {'form': form})
 
-
 def count(request):
-    form1 = NewNoteForm(formname='test')
-    form2 = NewNoteForm(formname='test2')
+    form1 = NoteForm(formname='test')
+    form2 = NoteForm(formname='test2')
     return render(request, 'count.html', {'forms': [form1, form2]})

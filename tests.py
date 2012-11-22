@@ -121,7 +121,7 @@ class MyTests(WebTest):
         upload['file'] = 'file.txt'
         response = form.submit(u'Submit')
         ##got to fail
-        assert u'Ensure uploaded file is an image' in response
+        assert u'not an image or a corrupted image' in response
         remove('file.txt')
         #create an image file and add it to upload field
         form = response.form
