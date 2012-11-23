@@ -107,35 +107,30 @@ class MyTests(WebTest):
         assert u'test_test_test' in self.app.get('/')
 
     def test_image_upload(self):
-        add_page = self.app.get('/add_note').follow()
-        form = add_page.form
-        form[u'title'] = 'test'
-        form[u'text'] = 'test_test_test'
-        #print form.upload_fields()
-        #print type(form.fields['image'][0])
-        upload = form.upload_fields()[0]
-        #create a non-image file and add it to upload field
+        title = 'test'
+        text = 'test_test_test'
         f = open('file.txt', 'w')
         f.write('bubububu\n')
         f.close()
-        upload['file'] = 'file.txt'
-        response = form.submit(u'Submit')
-        ##got to fail
-        assert u'not an image or a corrupted image' in response
+        post_content = dict(title=title, text=text)
+        upfile = [('image', 'file.txt')]
+        add_page_resp = self.app.post('/add_note/', post_content,
+         upload_files=upfile)
+        assert u'not an image or a corrupted image' in add_page_resp
         remove('file.txt')
         #create an image file and add it to upload field
-        form = response.form
-        ##title and text fields got to be same as submitted
-        assert form[u'title'] == 'test'
-        assert form[u'text'] == 'test_test_test'
-        upload['file'] = form.upload_fields()[0]
+        form = add_page_resp.form
+        assert form['title'].value == 'test'
+        assert form['text'].value == 'test_test_test'
         im =Image.new('RGB',(100,50))
         im.save('someimage.png', format='PNG')
-        upload = 'someimage.png'
-        form.submit(u'Submit')
+        upfile = [('image', 'someimage.png')]
+        new_add_resp = self.app.post('/add_note/', post_content,
+         upload_files=upfile).follow()
         #got to overcome
+        assert u'media/images/someimage' in new_add_resp
         remove('someimage.png')
-        assert u'Your message was sent. You can add a new one now.' in response
+        remove('media/images/someimage.png')
 
 
 class SeleniumTests(LiveServerTestCase):
