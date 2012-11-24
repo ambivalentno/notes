@@ -1,4 +1,6 @@
 
 title={{ title }}
 text={{ text }}
-<img src="{{STATIC_URL}}media/{{image}}">
+{%if image %}
+    <img src="{{STATIC_URL}}media/{{image}}">
+{%endif%}
