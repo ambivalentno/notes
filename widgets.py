@@ -5,7 +5,7 @@ from django.forms.util import flatatt
 
 class NewTextarea(Textarea):
     class Media:
-        js = ('test.js','jquery.js',)
+        js = ('test.js',)
 
     def __init__(self, attrs=None):
         default_attrs = {'name': 'default_name', 'id': 'default_id'}
