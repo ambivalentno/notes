@@ -10,3 +10,13 @@ function somef(inputa,outputa){
         $chars.html((parseInt($textarea.val().length)));
     });
 }
+
+(function() {
+
+$('form').ajaxForm({
+    success: function(xhr) {
+        status.html(xhr.responseText);
+    },
+    target: '#ajaxwrapper'
+}); 
+})(); 

@@ -1,10 +1,11 @@
 
 from django_webtest import WebTest
-from notes.models import Note
-
 from django.test import LiveServerTestCase
+from notes.models import Note
+from os import remove, getcwd
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import Image
 
 
 class MyTests(WebTest):
@@ -57,7 +58,6 @@ class MyTests(WebTest):
         form[u'title'] = 'test'
         form[u'text'] = 'test_test_test'
         form.submit()
-        # self.app.get('/').showbrowser()
         assert u'test_test_test' in self.app.get('/')
 
     def test_custom_widget(self):
@@ -92,19 +92,70 @@ class MyTests(WebTest):
     def test_ajax(self):
         #'csrf_checks = False ' in the beginning was included because 
         #I don't feel like manually providing csrf here is a right way to go.
+        ajax_header = {'X_REQUESTED_WITH': 'XMLHttpRequest'}
         title = ['test']
         text = ['test']
         post_args = {'title': title, 'text': text}
-        ajax_resp = self.app.post('/add_note/', post_args, 
-            {'X_REQUESTED_WITH': 'XMLHttpRequest'})
+        ajax_resp = self.app.post('/add_note/', post_args, ajax_header)
         assert u'Ensure this value has at least 10 characters' in ajax_resp
         title = ['test']
         text = ['test_test_test']
         post_args = {'title': title, 'text': text, 'form_name': ['add_note']}
-        ajax_resp = self.app.post('/add_note/', post_args, 
-            {'X_REQUESTED_WITH': 'XMLHttpRequest'})
+        ajax_resp = self.app.post('/add_note/', post_args, ajax_header)
         assert u'Your message was sent. You can add a new one now.' in ajax_resp
         assert u'test_test_test' in self.app.get('/')
+
+    def test_image_upload(self):
+        title = 'test'
+        text = 'test_test_test'
+        f = open('file.txt', 'w')
+        f.write('bubububu\n')
+        f.close()
+        post_content = dict(title=title, text=text)
+        upfile = [('image', 'file.txt')]
+        add_page_resp = self.app.post('/add_note/', post_content,
+         upload_files=upfile)
+        assert u'not an image or a corrupted image' in add_page_resp
+        remove('file.txt')
+        #create an image file and add it to upload field
+        form = add_page_resp.form
+        assert form['title'].value == 'test'
+        assert form['text'].value == 'test_test_test'
+        im =Image.new('RGB',(100,50))
+        im.save('someimage.png', format='PNG')
+        upfile = [('image', 'someimage.png')]
+        new_add_resp = self.app.post('/add_note/', post_content,
+         upload_files=upfile).follow()
+        #got to overcome
+        assert u'media/images/someimage' in new_add_resp
+        remove('someimage.png')
+        remove('media/images/someimage.png')
+
+    def test_ajax_image_upload(self):
+        #setup part
+        ajax_header = {'X_REQUESTED_WITH': 'XMLHttpRequest'}
+        title = ['test']
+        text = ['test_test_test']
+        #fail part
+        f = open('file.txt', 'w')
+        f.write('bubububu\n')
+        f.close()
+        upfile = [('image', 'file.txt')]
+        post_args = {'title': title, 'text': text}
+        ajax_resp = self.app.post('/add_note/', post_args, ajax_header,
+         upload_files=upfile)
+        assert u'not an image or a corrupted image' in ajax_resp
+        #good part
+        im =Image.new('RGB',(100,50))
+        im.save('someimage.png', format='PNG')
+        upfile = [('image', 'someimage.png')]
+        post_args = {'title': title, 'text': text, 'form_name': ['add_note']}
+        ajax_resp = self.app.post('/add_note/', post_args, ajax_header,
+         upload_files=upfile)
+        assert u'Your message was sent. You can add a new one now.' in ajax_resp
+        assert u'test_test_test' in self.app.get('/')
+        remove('someimage.png')
+        remove('file.txt')
 
 
 class SeleniumTests(LiveServerTestCase):
@@ -114,10 +165,13 @@ class SeleniumTests(LiveServerTestCase):
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
-        # pass
+        #pass
         self.browser.quit()
 
-    def test_ajax(self):
+#disabled as I don't have internet acccess, and I don't want neither 
+#download twitter over edge, nor edit templates to make them even uglier
+#than tey are now
+    def test_sel_ajax(self):
         add_page = self.browser.get(self.live_server_url + '/add_note')
         #input of not valid data
         title_field = self.browser.find_element_by_name('title')
@@ -137,21 +191,41 @@ class SeleniumTests(LiveServerTestCase):
         submit_button.click()
         body = self.browser.find_element_by_tag_name('body')
         assert 'Your message was sent. You can add a new one now.' in body.text
+    
+    def test_sel_ajax_image_upload(self):
+        add_page = self.browser.get(self.live_server_url + '/add_note')
+        title_field = self.browser.find_element_by_name('title')
+        text_field = self.browser.find_element_by_name('text')
+        title_field.send_keys('title')
+        text_field.send_keys('text_text_text')
+        im =Image.new('RGB',(100,50))
+        im.save('simage.png', format='PNG')
+        image_field = self.browser.find_element_by_name("image")
+        image_field.send_keys(getcwd()+"/simage.png")
+        submit_button = self.browser.find_element_by_name('Submit')
+        submit_button.click()        
+        page = self.browser.get(self.live_server_url + '/')
+        img = self.browser.find_element_by_tag_name('img')
+        img_src = img.get_attribute('src')
+        assert 'simage.png' in img_src
+        remove('simage.png')
+
 
 #     I wasn't able to find solid and simple solution to test javascript
 #     with webtest. so I'm using selenium for this
 #     UPD: actually, this stuff don't also :(
-#     def test_can_count_symbols(self):
-#         self.browser.get(self.live_server_url + '/count/')
-#         body = self.browser.find_element_by_tag_name('body')
-#         #first input
-#         textinput = self.browser.find_element_by_id('test')
-#         textinput.send_keys('admin111', Keys.RETURN)
-#         #second input on the same page
-#         textinput2 = self.browser.find_element_by_id('test2')
-#         textinput2.send_keys('admin1111', Keys.ARROW_DOWN)
-#         #sequentual assert for two inputs
-#         self.assertIn('8', body.text)
-#         self.assertIn('9', body.text)
-#         #simmultaneous assert
-#         assert '8' in body.text and '9' in body.text
+  #Probably, I should send Key_up to the form here, as javascript replies to it
+    # def test_can_count_symbols(self):
+    #     self.browser.get(self.live_server_url + '/count/')
+    #     body = self.browser.find_element_by_tag_name('body')
+    #     #first input
+    #     textinput = self.browser.find_element_by_id('test')
+    #     textinput.send_keys('admin111', Keys.RETURN)
+    #     #second input on the same page
+    #     textinput2 = self.browser.find_element_by_id('test2')
+    #     textinput2.send_keys('admin1111', Keys.ARROW_DOWN)
+    #     #sequentual assert for two inputs
+    #     self.assertIn('8', body.text)
+    #     self.assertIn('9', body.text)
+    #     #simmultaneous assert
+    #     assert '8' in body.text and '9' in body.text

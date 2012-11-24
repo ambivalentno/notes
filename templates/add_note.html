@@ -3,8 +3,7 @@
 {% block content%}
 <script src="{{STATIC_URL}}adding.js"></script>
 
-
-    <form action="/add_note/" method="post" id="contactform">
+    <form action="/add_note/" method="post" id="contactform" enctype="multipart/form-data">
         <div id="ajaxwrapper">
             {% csrf_token %}
             {{form.media}}
