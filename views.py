@@ -31,4 +31,8 @@ def count(request):
 
 def random_note(request):
     note = Note.objects.order_by('?')[0]
-    return render(request, 'show_note.html', {'note': note})
+    context = {'title': note.title, 'text': note.text, 'image': note.image}
+    return render(request, 'show_note.html', context)
+
+def test_embeddable_widget(request):
+    return render(request, 'emb_widg.html')
