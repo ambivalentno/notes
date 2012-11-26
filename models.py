@@ -6,7 +6,7 @@ class Note(models.Model):
 
     title = models.CharField(max_length=50)
     text = models.TextField()
-    image = models.ImageField(upload_to = 'images/',
+    image = models.ImageField(upload_to='images/',
      null=True, blank=True)
 
     def __unicode__(self):

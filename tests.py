@@ -1,5 +1,6 @@
 
 from django_webtest import WebTest
+from django.core.urlresolvers import reverse
 from django.test import LiveServerTestCase
 from notes.models import Note
 from os import remove, getcwd
@@ -13,21 +14,19 @@ class MyTests(WebTest):
     csrf_checks = False
 
     def test_of_model(self):
-        note = Note(title='sometitle', text='sometext')
-        note.save()
+        note = Note.objects.create(title='sometitle', text='sometext')
         all_notes = Note.objects.all()
         self.assertIn(note, all_notes)
 
     def test_of_note_output_at_index_page(self):
-        note = Note(title='sometitle', text='sometext')
-        note.save()
-        index_page = self.app.get('/')
+        note = Note.objects.create(title='sometitle', text='sometext')
+        index_page = self.app.get(reverse('index'))
         self.assertTemplateUsed(index_page, template_name='index.html')
         assert note.title in index_page
         assert note.text in index_page
 
     def test_that_admin_works(self):
-        login_page = self.app.get('/admin').follow()
+        login_page = self.app.get(reverse('admin:index'))
         form = login_page.form
         form[u'username'] = 'nikita'
         form[u'password'] = 'n1k1ta'
@@ -48,7 +47,7 @@ class MyTests(WebTest):
         assert 'new_test_text' in index_page
 
     def test_adding_new_note(self):
-        add_page = self.app.get('/add_note').follow()
+        add_page = self.app.get(reverse('add_note'))
         form = add_page.form
         form[u'title'] = 'test'
         form[u'text'] = 'test'
@@ -58,17 +57,17 @@ class MyTests(WebTest):
         form[u'title'] = 'test'
         form[u'text'] = 'test_test_test'
         form.submit()
-        assert u'test_test_test' in self.app.get('/')
+        assert u'test_test_test' in self.app.get(reverse('index'))
 
     def test_custom_widget(self):
-        page = self.app.get('/count/')
+        page = self.app.get(reverse('count'))
         assert 'id="test"' in page
         assert 'id="test2"' in page
 
     def test_custom_widget_in_admin(self):
         testing_note = Note(title='sometitle', text='sometext1111')
         testing_note.save()
-        login_page = self.app.get('/admin').follow()
+        login_page = self.app.get(reverse('admin:index'))
         form = login_page.form
         form[u'username'] = 'nikita'
         form[u'password'] = 'n1k1ta'
@@ -84,24 +83,24 @@ class MyTests(WebTest):
         testing_note.save()
         testing_note = Note(title='sometitle2', text='sometext1111')
         testing_note.save()
-        page = self.app.get('/')
+        page = self.app.get(reverse('index'))
         assert 'notes number=2' in page
-        page = self.app.get('/add_note/')
+        page = self.app.get(reverse('add_note'))
         assert 'notes number=2' in page
 
     def test_ajax(self):
-        #'csrf_checks = False ' in the beginning was included because 
+        #'csrf_checks = False ' in the beginning was included because
         #I don't feel like manually providing csrf here is a right way to go.
         ajax_header = {'X_REQUESTED_WITH': 'XMLHttpRequest'}
         title = ['test']
         text = ['test']
         post_args = {'title': title, 'text': text}
-        ajax_resp = self.app.post('/add_note/', post_args, ajax_header)
+        ajax_resp = self.app.post(reverse('add_note'), post_args, ajax_header)
         assert u'Ensure this value has at least 10 characters' in ajax_resp
         title = ['test']
         text = ['test_test_test']
         post_args = {'title': title, 'text': text, 'form_name': ['add_note']}
-        ajax_resp = self.app.post('/add_note/', post_args, ajax_header)
+        ajax_resp = self.app.post(reverse('add_note'), post_args, ajax_header)
         assert u'Your message was sent. You can add a new one now.' in ajax_resp
         assert u'test_test_test' in self.app.get('/')
 
@@ -113,7 +112,7 @@ class MyTests(WebTest):
         f.close()
         post_content = dict(title=title, text=text)
         upfile = [('image', 'file.txt')]
-        add_page_resp = self.app.post('/add_note/', post_content,
+        add_page_resp = self.app.post(reverse('add_note'), post_content,
          upload_files=upfile)
         assert u'not an image or a corrupted image' in add_page_resp
         remove('file.txt')
@@ -121,10 +120,10 @@ class MyTests(WebTest):
         form = add_page_resp.form
         assert form['title'].value == 'test'
         assert form['text'].value == 'test_test_test'
-        im =Image.new('RGB',(100,50))
+        im = Image.new('RGB', (100, 50))
         im.save('someimage.png', format='PNG')
         upfile = [('image', 'someimage.png')]
-        new_add_resp = self.app.post('/add_note/', post_content,
+        new_add_resp = self.app.post(reverse('add_note'), post_content,
          upload_files=upfile).follow()
         #got to overcome
         assert u'media/images/someimage' in new_add_resp
@@ -142,20 +141,21 @@ class MyTests(WebTest):
         f.close()
         upfile = [('image', 'file.txt')]
         post_args = {'title': title, 'text': text}
-        ajax_resp = self.app.post('/add_note/', post_args, ajax_header,
+        ajax_resp = self.app.post(reverse('add_note'), post_args, ajax_header,
          upload_files=upfile)
         assert u'not an image or a corrupted image' in ajax_resp
         #good part
-        im =Image.new('RGB',(100,50))
+        im = Image.new('RGB', (100, 50))
         im.save('someimage.png', format='PNG')
         upfile = [('image', 'someimage.png')]
         post_args = {'title': title, 'text': text, 'form_name': ['add_note']}
-        ajax_resp = self.app.post('/add_note/', post_args, ajax_header,
+        ajax_resp = self.app.post(reverse('add_note'), post_args, ajax_header,
          upload_files=upfile)
         assert u'Your message was sent. You can add a new one now.' in ajax_resp
-        assert u'test_test_test' in self.app.get('/')
+        assert u'test_test_test' in self.app.get(reverse('index'))
         remove('someimage.png')
         remove('file.txt')
+        remove('media/images/someimage.png')
 
 
 class SeleniumTests(LiveServerTestCase):
@@ -165,21 +165,18 @@ class SeleniumTests(LiveServerTestCase):
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
-        pass
-        # self.browser.quit()
+        # pass
+        self.browser.quit()
 
-#disabled as I don't have internet acccess, and I don't want neither 
-#download twitter over edge, nor edit templates to make them even uglier
-#than tey are now
-    def not_test_sel_ajax(self):
-        add_page = self.browser.get(self.live_server_url + '/add_note')
+    def test_sel_ajax(self):
+        add_page = self.browser.get(self.live_server_url + reverse('add_note'))
         #input of not valid data
         title_field = self.browser.find_element_by_name('title')
         title_field.send_keys('title')
         text_field = self.browser.find_element_by_name('text')
         text_field.send_keys('text')
         submit_button = self.browser.find_element_by_name('Submit')
-        submit_button.click()        
+        submit_button.click()
         body = self.browser.find_element_by_tag_name('body')
         assert 'Ensure this value has at least' in body.text
         #input of valid data
@@ -191,19 +188,19 @@ class SeleniumTests(LiveServerTestCase):
         submit_button.click()
         body = self.browser.find_element_by_tag_name('body')
         assert 'Your message was sent. You can add a new one now.' in body.text
-    
-    def not_test_sel_ajax_image_upload(self):
-        add_page = self.browser.get(self.live_server_url + '/add_note')
+
+    def test_sel_ajax_image_upload(self):
+        add_page = self.browser.get(self.live_server_url + reverse('add_note'))
         title_field = self.browser.find_element_by_name('title')
         text_field = self.browser.find_element_by_name('text')
         title_field.send_keys('title')
         text_field.send_keys('text_text_text')
-        im =Image.new('RGB',(100,50))
+        im = Image.new('RGB', (100, 50))
         im.save('simage.png', format='PNG')
         image_field = self.browser.find_element_by_name("image")
-        image_field.send_keys(getcwd()+"/simage.png")
+        image_field.send_keys(getcwd() + "/simage.png")
         submit_button = self.browser.find_element_by_name('Submit')
-        submit_button.click()        
+        submit_button.click()
         page = self.browser.get(self.live_server_url + '/')
         img = self.browser.find_element_by_tag_name('img')
         img_src = img.get_attribute('src')
@@ -211,14 +208,13 @@ class SeleniumTests(LiveServerTestCase):
         remove('simage.png')
         remove('media/images/simage.png')
 
-    def test_emddable_widget(self):
-        note = Note(title='sometitle1', text='sometext1')
-        note.save()
-        # rand_page = self.browser.get(self.live_server_url + '/random_note')
-        # assert note.title in self.browser.page_source
-        widg_page = self.browser.get(self.live_server_url + '/emb_widg')
+    def test_embeddable_widget(self):
+        note = Note.objects.create(title='sometitle1', text='sometext1')
+        rand_page = self.browser.get(self.live_server_url +
+         reverse('random_note'))
+        assert note.title in self.browser.page_source
+        widg_page = self.browser.get(self.live_server_url + reverse('emb_widg'))
         self.browser.implicitly_wait(30)
-        # self.browser.execute_script("$('#container').load('"+self.live_server_url+"/random_note/');")
         body = self.browser.find_element_by_tag_name('body').text
         assert note.title in body
         assert note.text in body

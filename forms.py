@@ -4,9 +4,6 @@ from widgets import NewTextarea
 from models import Note
 
 
-
-
-
 class NoteAdminForm(forms.ModelForm):
     text = forms.CharField(widget=NewTextarea())
 

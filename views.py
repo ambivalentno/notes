@@ -19,20 +19,23 @@ def add_note(request):
                 return render(request, 'ajax_success.html', {'form': NoteForm()})
             return HttpResponseRedirect('/')
         if request.is_ajax():
-            return render(request, 'ajax_fail.html', {'form': form}) 
+            return render(request, 'ajax_fail.html', {'form': form})
         return render(request, 'add_note.html', {'form': form})
     form = NoteForm()
     return render(request, 'add_note.html', {'form': form})
+
 
 def count(request):
     form1 = NoteForm(formname='test')
     form2 = NoteForm(formname='test2')
     return render(request, 'count.html', {'forms': [form1, form2]})
 
+
 def random_note(request):
     note = Note.objects.order_by('?')[0]
     context = {'title': note.title, 'text': note.text, 'image': note.image}
     return render(request, 'show_note.html', context)
+
 
 def test_embeddable_widget(request):
     return render(request, 'emb_widg.html')
