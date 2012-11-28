@@ -83,14 +83,15 @@ class MyTests(WebTest):
 
     def test_notes_nmbr_in_context(self):
         '''test that we have number of notes at most pages'''
-        testing_note = Note(title='sometitle1', text='sometext1111')
-        testing_note.save()
-        testing_note = Note(title='sometitle2', text='sometext1111')
-        testing_note.save()
+        testing_note = Note.objects.create(title='sometitle1',
+         text='sometext1111')
         page = self.app.get(reverse('index'))
-        assert 'notes number=2' in page
+        assert page.context['NOTES_NUMBER'] == 1
+        testing_note = Note.objects.create(title='sometitle2',
+         text='sometext1111')
+        testing_note.save()
         page = self.app.get(reverse('add_note'))
-        assert 'notes number=2' in page
+        assert page.context['NOTES_NUMBER'] == 2
 
     def test_ajax(self):
         '''test that ajax post works'''
