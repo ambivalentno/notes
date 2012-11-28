@@ -134,6 +134,9 @@ class MyTests(WebTest):
         #got to overcome
         assert u'media/images/someimage' in new_add_resp
         remove('someimage.png')
+        #testing if image is in database and an image
+        note = Note.objects.get(title='test', text='test_test_test')
+        Image.open(note.image).verify()
         remove('media/images/someimage.png')
 
     def test_ajax_image_upload(self):
