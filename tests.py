@@ -30,23 +30,19 @@ class MyTests(WebTest):
 
     def test_that_admin_works(self):
         '''test that we can add Note with django admin'''
-        login_page = self.app.get(reverse('admin:index'))
-        form = login_page.form
+        res = self.app.get(reverse('admin:notes_note_add'))
+        form = res.form
         form[u'username'] = 'nikita'
         form[u'password'] = 'n1k1ta'
-        res = form.submit()
-        res = res.follow()
-        assert u'/note/add/' in res.body
-        #I'm not really sure what particular link should I press
-        #UPD: got it from 'print res.body'
-        add_note = res.click(href='/admin/notes/note/add/')
-        #I've had form field list with this:
-        #print add_note.form.fields
-        form = add_note.form
+        res = form.submit().follow()
+        form = res.form
         form[u'title'] = u'new_test_title'
         form[u'text'] = u'new_test_text'
         res = form.submit(u'_save')
         index_page = self.app.get(reverse('index'))
+        #here's my test is note added to the db
+        #if not - we'll have an error here
+        Note.objects.get(title='new_test_title', text='new_test_text')
         assert 'new_test_title' in index_page
         assert 'new_test_text' in index_page
 
