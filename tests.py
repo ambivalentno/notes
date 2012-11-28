@@ -5,7 +5,9 @@ from selenium import webdriver
 
 from django_webtest import WebTest
 from django.core.urlresolvers import reverse
+from django.template import Context, Template
 from django.test import LiveServerTestCase
+
 
 from my_test.apps.notes.models import Note
 
@@ -89,7 +91,6 @@ class MyTests(WebTest):
         assert page.context['NOTES_NUMBER'] == 1
         testing_note = Note.objects.create(title='sometitle2',
          text='sometext1111')
-        testing_note.save()
         page = self.app.get(reverse('add_note'))
         assert page.context['NOTES_NUMBER'] == 2
 
@@ -167,6 +168,16 @@ class MyTests(WebTest):
         remove('someimage.png')
         remove('file.txt')
         remove('media/images/someimage.png')
+
+    def test_custom_template_tag(self):
+        '''test of show_note template tag'''
+        note = Note.objects.create(title='title1', text='text2')
+        string = '{% load show_note %}{% show_note ' + str(note.id) + '%}'
+        t = Template(string)
+        c = Context({})
+        rendered = t.render(c)
+        assert note.title in rendered
+        assert note.text in rendered
 
 
 class SeleniumTests(LiveServerTestCase):
