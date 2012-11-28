@@ -5,6 +5,7 @@
     <div class="span8 offset2">
         
         <div id="content">
+            <a href="{%url add_note %}">ADD NEW NOTE</a>
             {% for note in notes %}
     			<div name="note_{{note.id}}" class="page-header">
     				{% show_note note.id %}
