@@ -7,7 +7,7 @@
         <div id="content">
             {% for note in notes %}
     			<div name="note_{{note.id}}" class="page-header">
-    				{% show_note note %}
+    				{% show_note note.id %}
     			</div>
     		{% endfor %}
         </div>

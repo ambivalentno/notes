@@ -1,9 +1,9 @@
 from django.forms.widgets import Textarea
 from django.utils.safestring import mark_safe
-from django.forms.util import flatatt
 
 
 class NewTextarea(Textarea):
+    '''Textarea + symbol counter widget '''
     class Media:
         js = ('test.js',)
 

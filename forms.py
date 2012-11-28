@@ -1,10 +1,11 @@
 from django import forms
-from django.forms.widgets import HiddenInput
-from widgets import NewTextarea
-from models import Note
+
+from my_test.apps.notes.widgets import NewTextarea
+from my_test.apps.notes.models import Note
 
 
 class NoteAdminForm(forms.ModelForm):
+    '''Form to edit Note in admin'''
     text = forms.CharField(widget=NewTextarea())
 
     class Meta:
@@ -12,6 +13,7 @@ class NoteAdminForm(forms.ModelForm):
 
 
 class NoteForm(forms.ModelForm):
+    '''Form for Note object. Counts symbols'''
     def __init__(self, *args, **kwargs):
         formname = kwargs.pop('formname', 'add_form')
         data = kwargs.pop('data', None)
