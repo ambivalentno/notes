@@ -11,7 +11,7 @@ from my_test.apps.notes.models import Note
 
 
 class MyTests(WebTest):
-    fixtures = ['starting.json']
+    fixtures = ['start.json']
     csrf_checks = False
 
     def test_of_model(self):
@@ -32,8 +32,8 @@ class MyTests(WebTest):
         '''test that we can add Note with django admin'''
         res = self.app.get(reverse('admin:notes_note_add'))
         form = res.form
-        form[u'username'] = 'nikita'
-        form[u'password'] = 'n1k1ta'
+        form[u'username'] = 'admin'
+        form[u'password'] = 'admin'
         res = form.submit().follow()
         form = res.form
         form[u'title'] = u'new_test_title'
@@ -72,8 +72,8 @@ class MyTests(WebTest):
         testing_note.save()
         login_page = self.app.get(reverse('admin:index'))
         form = login_page.form
-        form[u'username'] = 'nikita'
-        form[u'password'] = 'n1k1ta'
+        form[u'username'] = 'admin'
+        form[u'password'] = 'admin'
         res = form.submit()
         res = res.follow()
         notes = res.click('Notes', href='/admin/notes/note/')
