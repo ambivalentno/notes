@@ -2,7 +2,8 @@
 
 {% block content%}
     {% load show_note %}
-    <div class="span8 offset2">
+    <div class="row">
+    <div class="span4 offset2">
         
         <div id="content">
             <a href="{%url add_note %}">ADD NEW NOTE</a>
@@ -13,19 +14,28 @@
     		{% endfor %}
         </div>
 
-        <div>
-
-        {% filter force_escape %}
-            You can insert this to your page and obtain a random note:
-            {{STATIC_URL}}embed_widget.js
-            <div id="container"></div>
-        {% endfilter %}
-
-        {% filter force_escape %}
-            {%include 'emb_widg.html' %}
-        {% endfilter %}
-
-        </div>
+        
     </div>
+    </div>
+
+
+        <div class=row>
+            <div class="span4 offset4">
+                You can insert this to your page and obtain a random note:
+                    <div style='border: 1px solid black;'>
+                    <p>
+                {% filter force_escape %}
+                    <script src="http://127.0.0.1:8000{{STATIC_URL}}embed_widget.js"
+                    </script>
+                {% endfilter %}
+                    </p><p>
+                {% filter force_escape %}
+                    <div id="container"></div>
+                {% endfilter %}
+                    </p>
+                    </div>
+                    Please, ensure you've got jQuery there!
+            </div>
+        </div>
     
 {% endblock %}
