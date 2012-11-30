@@ -12,5 +12,20 @@
     			</div>
     		{% endfor %}
         </div>
+
+        <div>
+
+        {% filter force_escape %}
+            You can insert this to your page and obtain a random note:
+            {{STATIC_URL}}embed_widget.js
+            <div id="container"></div>
+        {% endfilter %}
+
+        {% filter force_escape %}
+            {%include 'emb_widg.html' %}
+        {% endfilter %}
+
+        </div>
     </div>
+    
 {% endblock %}

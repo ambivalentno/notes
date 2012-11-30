@@ -88,11 +88,11 @@ class MyTests(WebTest):
         testing_note = Note.objects.create(title='sometitle1',
          text='sometext1111')
         page = self.app.get(reverse('index'))
-        assert page.context['NOTES_NUMBER'] == 1
+        assert page.context['notes_number'] == 1
         testing_note = Note.objects.create(title='sometitle2',
          text='sometext1111')
         page = self.app.get(reverse('add_note'))
-        assert page.context['NOTES_NUMBER'] == 2
+        assert page.context['notes_number'] == 2
 
     def test_ajax(self):
         '''test that ajax post works'''
