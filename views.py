@@ -25,6 +25,7 @@ def add_note(request):
                  {'form': NoteForm()})
             return HttpResponseRedirect(reverse('index'))
         if request.is_ajax():
+            print dir(form.fields['text'])
             return render(request, 'ajax_fail.html', {'form': form})
         return render(request, 'add_note.html', {'form': form})
     form = NoteForm()
