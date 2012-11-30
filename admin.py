@@ -1,8 +1,8 @@
 
 from django.contrib import admin
 
-from my_test.apps.notes.models import Note
-from my_test.apps.notes.forms import NoteAdminForm
+from notes.models import Note
+from notes.forms import NoteAdminForm
 
 
 class NoteAdmin(admin.ModelAdmin):

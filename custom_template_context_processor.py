@@ -1,4 +1,4 @@
-from my_test.apps.notes.models import Note
+from notes.models import Note
 
 
 def default(request):

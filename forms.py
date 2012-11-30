@@ -1,7 +1,7 @@
 from django import forms
 
-from my_test.apps.notes.widgets import NewTextarea
-from my_test.apps.notes.models import Note
+from notes.widgets import NewTextarea
+from notes.models import Note
 
 
 class NoteAdminForm(forms.ModelForm):

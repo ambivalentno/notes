@@ -9,8 +9,7 @@ from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import LiveServerTestCase
 
-
-from my_test.apps.notes.models import Note
+from notes.models import Note
 
 
 class MyTests(WebTest):

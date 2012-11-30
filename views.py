@@ -3,8 +3,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from my_test.apps.notes.models import Note
-from my_test.apps.notes.forms import NoteForm
+from notes.models import Note
+from notes.forms import NoteForm
 
 
 def index(request):
