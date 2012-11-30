@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Note(models.Model):
-    '''core model. consist of title, text and image'''
+    '''Core model. consist of title, text and image'''
 
     title = models.CharField(max_length=50)
     text = models.TextField()

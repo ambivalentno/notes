@@ -7,7 +7,6 @@ from my_test.apps.notes.models import Note
 from my_test.apps.notes.forms import NoteForm
 
 
-
 def index(request):
     '''Shows list of all Note objects.'''
     context = {'notes': Note.objects.all()}
@@ -25,7 +24,6 @@ def add_note(request):
                  {'form': NoteForm()})
             return HttpResponseRedirect(reverse('index'))
         if request.is_ajax():
-            print dir(form.fields['text'])
             return render(request, 'ajax_fail.html', {'form': form})
         return render(request, 'add_note.html', {'form': form})
     form = NoteForm()
@@ -34,7 +32,7 @@ def add_note(request):
 
 def count(request):
     '''
-    View to test that symbols count with NoteForm works 
+    View to test that symbols count with NoteForm works
     with two forms at the same time.
     '''
     form1 = NoteForm(formname='test')
