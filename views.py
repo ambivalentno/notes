@@ -35,8 +35,8 @@ def count(request):
     View to test that symbols count with NoteForm works
     with two forms at the same time.
     '''
-    form1 = NoteForm(formname='test')
-    form2 = NoteForm(formname='test2')
+    form1 = NoteForm()
+    form2 = NoteForm()
     return render(request, 'count.html', {'forms': [form1, form2]})
 
 
