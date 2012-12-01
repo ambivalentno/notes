@@ -5,15 +5,12 @@ from django.utils.safestring import mark_safe
 class NewTextarea(Textarea):
     '''Textarea + symbol counter widget '''
     class Media:
-        js = ('test.js',)
+        js = ('adding.js',)
 
     def __init__(self, attrs=None):
         default_attrs = {'name': 'default_name', 'id': 'default_id'}
         if attrs:
             default_attrs.update(attrs)
-
-        default_attrs['onclick'] = "somef('" + default_attrs['id'] + \
-            "','output_" + default_attrs['id'] + "')"
         super(NewTextarea, self).__init__(attrs=default_attrs)
 
     def render(self, name, value, attrs=None):
@@ -23,6 +20,7 @@ class NewTextarea(Textarea):
         base_html = super(NewTextarea, self).render(name, value,
          attrs=final_attrs)
         output_id = u' id=output_' + final_attrs['id']
-        counter = u'<p%s></p>' % output_id
-        all_html = base_html + counter
+        script = u'<script> django.jQuery(document).ready(function(){ \
+            django.jQuery("#%s").charCount();}); </script>' % final_attrs['id']
+        all_html = base_html + script
         return mark_safe(all_html)
