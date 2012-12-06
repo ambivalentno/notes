@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 
 {% block content%}
+<script src="{{STATIC_URL}}adding.js"></script>
 <div class="span8 offset2">
-
-
     <form action="{%url add_note %}" method="post" id="contactform" enctype="multipart/form-data">
         <fieldset>
             <div id="ajaxwrapper">

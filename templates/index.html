@@ -22,17 +22,10 @@
         <div class=row>
             <div class="span4 offset4">
                 You can insert this to your page and obtain a random note:
-                    <div style='border: 1px solid black;'>
-                    <p>
-                {% filter force_escape %}
-                    <script src="http://127.0.0.1:8000{{STATIC_URL}}embed_widget.js"
-                    </script>
-                {% endfilter %}
-                    </p><p>
-                {% filter force_escape %}
-                    <div id="container"></div>
-                {% endfilter %}
-                    </p>
+                    <div>
+                    <pre>
+{% filter force_escape %}<script src="http://127.0.0.1:8000{{STATIC_URL}}embed_widget.js"</script>
+<div id="container"></div>{% endfilter %}</pre>
                     </div>
                     Please, ensure you've got jQuery there!
             </div>

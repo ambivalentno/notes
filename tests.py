@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import LiveServerTestCase
 
+from notes.forms import NoteForm
 from notes.models import Note
 
 
@@ -190,6 +191,15 @@ class MyTests(WebTest):
         rendered = t.render(c)
         assert note.title in rendered
         assert note.text in rendered
+
+    def test_adding_new_css_classes_to_NewTextarea(self):
+        '''Test of adding stuff with django-widget-tweaks. E.g., css'''
+        form = NoteForm()
+        string = '{% load widget_tweaks %}{{form.text|add_class:"new_class"}}'
+        t = Template(string)
+        c = Context({'form': form})
+        rendered = t.render(c)
+        assert 'class="new_class countable"' in rendered
 
 
 class SeleniumTests(LiveServerTestCase):

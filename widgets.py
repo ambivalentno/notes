@@ -8,7 +8,12 @@ class NewTextarea(Textarea):
         js = ('char_count_text_areas.js',)
 
     def render(self, name, value, attrs=None):
+        try:
+            attrs['class'] += ' countable'
+        except KeyError:
+            attrs['class'] = 'countable'
+
         base_html = super(NewTextarea, self).render(name, value,
-         attrs={'class': 'countable'})
-        all_html = '<div>' + base_html + u'<p><span>0</span></p></div>' 
+         attrs=attrs)
+        all_html = '<div>' + base_html + u'<p><span>0</span></p></div>'
         return mark_safe(all_html)
