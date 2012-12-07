@@ -9,7 +9,7 @@ from notes.forms import NoteForm
 
 def index(request):
     '''Shows list of all Note objects.'''
-    context = {'notes': Note.objects.all()}
+    context = {'notes': Note.objects.all(), 'site': request.get_host()}
     return render(request, 'index.html', context)
 
 
@@ -49,4 +49,8 @@ def random_note(request):
 
 def test_embeddable_widget(request):
     '''Returns data to render with embeddable widget'''
-    return render(request, 'emb_widg.html')
+    return render(request, 'emb_widg.html', {'site': request.get_host()})
+
+def serve_embed_widget(request):
+    '''Serves emb_widg.js'''
+    return render(request, 'embed_widget.js', {'site': request.get_host()})
