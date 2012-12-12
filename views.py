@@ -54,5 +54,6 @@ def test_embeddable_widget(request):
 
 def serve_embed_widget(request):
     '''Serves emb_widg.js'''
+    content_type="application/x-javascript"
     return render(request, 'embed_widget.js',
-     {'site': RequestSite(request).name})
+     {'site': RequestSite(request).name}, content_type=content_type)

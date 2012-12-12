@@ -201,6 +201,12 @@ class MyTests(WebTest):
         rendered = t.render(c)
         assert 'class="new_class countable"' in rendered
 
+    def test_mime_type_of_generated_js(self):
+        '''Test if template-generated js is js, not html/text'''
+        response = self.app.get(reverse('serve_widg'))
+        assert response.content_type == 'application/x-javascript'
+
+
 
 class SeleniumTests(LiveServerTestCase):
 
