@@ -206,6 +206,12 @@ class MyTests(WebTest):
         response = self.app.get(reverse('serve_widg'))
         assert response.content_type == 'application/x-javascript'
 
+    def test_access_control_allow_origin_header(self):
+        '''Test that random_note has right header'''
+        note = Note.objects.create(title='sometitle', text='sometext')
+        response = self.app.get(reverse('random_note'))
+        assert 'Access-Control-Allow-Origin' in response.headers
+        assert response.headers['Access-Control-Allow-Origin'] == '*'
 
 
 class SeleniumTests(LiveServerTestCase):

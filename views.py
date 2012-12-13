@@ -2,7 +2,7 @@
 from django.contrib.sites.models import RequestSite
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 
 from notes.models import Note
 from notes.forms import NoteForm
@@ -44,16 +44,24 @@ def count(request):
 def random_note(request):
     '''Returns random note'''
     note = Note.objects.order_by('?')[0]
-    context = {'title': note.title, 'text': note.text, 'image': note.image}
-    return render(request, 'show_note.html', context)
+    context = {'title': note.title,
+               'text': note.text,
+               'image': note.image,
+               'site': RequestSite(request).name}
+    response = render_to_response('show_note.html', context)
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
 def test_embeddable_widget(request):
     '''Returns data to render with embeddable widget'''
-    return render(request, 'emb_widg.html', {'site': RequestSite(request).name})
+    return render(request, 'emb_widg.html',
+     {'site': RequestSite(request).name})
+
 
 def serve_embed_widget(request):
     '''Serves emb_widg.js'''
-    content_type="application/x-javascript"
-    return render(request, 'embed_widget.js',
-     {'site': RequestSite(request).name}, content_type=content_type)
+    response = render_to_response('embed_widget.js',
+     {'site': RequestSite(request).name})
+    response['Content-Type'] = "application/x-javascript"
+    return response
